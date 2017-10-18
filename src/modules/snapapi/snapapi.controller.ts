@@ -1,44 +1,105 @@
-import { RxHR } from '@akanass/rx-http-request';
-import { Controller, Param, Get, Req, Res } from '@nestjs/common';
-import { Request, Response } from 'express';
+import { RxHR, RxHttpRequestResponse } from '@akanass/rx-http-request';
+import { Controller, Param, Get, Res } from '@nestjs/common';
+import { Response } from 'express';
+
+import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/operator/timeout';
 
 import * as storage from 'node-persist';
 
 @Controller('snapapi')
 export class SnapApiController {
 
+  private CORS: string = '*';
+
   constructor() {
   }
 
   @Get('tasks/:server')
-  getTasks(@Req() req: Request, @Res() res: Response, @Param('server') server: string) {
+  getTasksList(@Res() res: Response, @Param('server') server: string) {
     RxHR.get(server + '/v2/tasks')
-    .subscribe(
-      (data) => {
-        res.header('Access-Control-Allow-Origin', 'http://localhost:4200');
-        res.status(data.response.statusCode).json(JSON.parse(data.response.body));
-      },
-      (error) => {
-        console.error(error);
-      },
-    );
+      .timeout(100)
+      .catch(
+        (err, data) => {
+          return Observable.of({});
+        },
+      )
+      .subscribe(
+        (data) => {
+          res.header('Access-Control-Allow-Origin', this.CORS);
+          if (this.isRxHttpRequestResponse(data)) {
+            res.status(data.response.statusCode).json(JSON.parse(data.response.body));
+          } else {
+            res.sendStatus(500);
+          }
+        },
+      );
   }
 
   @Get('tasks/:server/:id')
-  getTask(@Req() req: Request, @Res() res: Response, @Param('server') server: string, @Param('id') id: string) {
+  getTask(@Res() res: Response, @Param('server') server: string, @Param('id') id: string) {
     RxHR.get(server + '/v2/tasks/' + id)
-    .subscribe(
-      (data) => {
-        res.header('Access-Control-Allow-Origin', 'http://localhost:4200');
-        res.status(data.response.statusCode).json(JSON.parse(data.response.body));
-      },
-      (err) => {
-        console.error(err);
-      },
-      () => {
-        console.log('DONE');
-      },
-    );
+      .timeout(200)
+      .catch(
+        (err, data) => {
+          return Observable.of({});
+        },
+      )
+      .subscribe(
+        (data) => {
+          res.header('Access-Control-Allow-Origin', this.CORS);
+          if (this.isRxHttpRequestResponse(data)) {
+            res.status(data.response.statusCode).json(JSON.parse(data.response.body));
+          } else {
+            res.sendStatus(500);
+          }
+        },
+      );
   }
 
+  @Get('metrics/:server')
+  getMetricsList(@Res() res: Response, @Param('server') server: string) {
+    RxHR.get(server + '/v2/metrics')
+      .timeout(200)
+      .catch(
+        (err, data) => {
+          return Observable.of({});
+        },
+      )
+      .subscribe(
+        (data) => {
+          res.header('Access-Control-Allow-Origin', this.CORS);
+          if (this.isRxHttpRequestResponse(data)) {
+            res.status(data.response.statusCode).json(JSON.parse(data.response.body));
+          } else {
+            res.sendStatus(500);
+          }
+        },
+      );
+  }
+
+  @Get('plugins/:server')
+  getPLuginsList(@Res() res: Response, @Param('server') server: string) {
+    RxHR.get(server + '/v2/plugins')
+      .timeout(200)
+      .catch(
+        (err, data) => {
+          return Observable.of({});
+        },
+      )
+      .subscribe(
+        (data) => {
+          res.header('Access-Control-Allow-Origin', this.CORS);
+          if (this.isRxHttpRequestResponse(data)) {
+            res.status(data.response.statusCode).json(JSON.parse(data.response.body));
+          } else {
+            res.sendStatus(500);
+          }
+        },
+      );
+  }
+
+  private isRxHttpRequestResponse(arg: any): arg is RxHttpRequestResponse {
+    return arg.response !== undefined && arg.body !== undefined;
+  }
 }

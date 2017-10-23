@@ -5,8 +5,9 @@ import { NestFactory } from '@nestjs/core';
 import { ApplicationModule } from './modules/app.module';
 
 const numCPUs = cpus().length;
+const serverPort = 3000;
 
-function bootstrap() {
+function bootstrapCluster() {
   if (cluster.isMaster) {
     for (let i = 0; i < numCPUs; i++) {
       cluster.fork();
@@ -16,10 +17,17 @@ function bootstrap() {
       .then(
         (a) => {
           a.use(bodyParser.json());
-          a.listen(3000);
+          a.listen(serverPort);
         },
       );
   }
 }
 
+async function bootstrap() {
+  const app = await NestFactory.create(ApplicationModule);
+  app.use(bodyParser.json());
+  app.listen(serverPort);
+}
+
+// bootstrapCluster();
 bootstrap();

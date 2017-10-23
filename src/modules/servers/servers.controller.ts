@@ -1,13 +1,13 @@
-import { Controller, Param, Get, Put, Post, Req, Res, Body } from '@nestjs/common';
+import { Controller, Param, Get, Put, Delete, Options, Post, Req, Res, Body } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { initSync, getItemSync, setItemSync } from 'node-persist';
 import { SnapServer } from '../../shared/snap';
 
-@Controller('servers')
-
+@Controller('serversapi')
 export class SeversController {
 
     private servers: any;
+    private CORS: string = '*';
 
   constructor() {
     initSync();
@@ -16,21 +16,43 @@ export class SeversController {
 
   @Get('')
   getServerList(@Res() res: Response) {
-    res.header('Access-Control-Allow-Origin', 'http://localhost:4200');
     res.json(this.servers);
   }
 
   @Get(':id')
   getServer(@Res() res: Response, @Param('id') id: string) {
-      res.header('Access-Control-Allow-Origin', 'http://localhost:4200');
       res.json(this.servers[id]);
   }
 
   @Post('')
-  updateServer(@Body() server: SnapServer, @Req() req: Request, @Res() res: Response) {
+  createServer(@Body() server: SnapServer, @Res() res: Response) {
       this.servers[server.key] = server;
       setItemSync('snaptel_servers', this.servers);
-      res.header('Access-Control-Allow-Origin', 'http://localhost:4200');
       res.send('');
   }
+
+  @Put(':id')
+  updateServer(@Body() server: SnapServer, @Res() res: Response, @Param('id') id: string) {
+      this.servers[id] = server;
+      setItemSync('snaptel_servers', this.servers);
+      res.send('');
+  }
+
+  @Delete(':id')
+  removeServer(@Res() res: Response, @Param('id') id: string) {
+      delete(this.servers[id]);
+      setItemSync('snaptel_servers', this.servers);
+      res.send('');
+  }
+
+  @Options('')
+  options(@Body() body, @Res() res) {
+    res.send(body);
+  }
+
+  @Options(':id')
+  optionsID(@Body() body, @Res() res) {
+    res.send(body);
+  }
+
 }

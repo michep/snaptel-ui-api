@@ -10,8 +10,6 @@ import * as storage from 'node-persist';
 @Controller('snapapi')
 export class SnapApiController {
 
-  private CORS: string = '*';
-
   constructor() {
   }
 
@@ -26,7 +24,6 @@ export class SnapApiController {
       )
       .subscribe(
         (data) => {
-          res.header('Access-Control-Allow-Origin', this.CORS);
           if (this.isRxHttpRequestResponse(data)) {
             res.status(data.response.statusCode).json(JSON.parse(data.response.body));
           } else {
@@ -47,7 +44,6 @@ export class SnapApiController {
       )
       .subscribe(
         (data) => {
-          res.header('Access-Control-Allow-Origin', this.CORS);
           if (this.isRxHttpRequestResponse(data)) {
             res.status(data.response.statusCode).json(JSON.parse(data.response.body));
           } else {
@@ -68,7 +64,6 @@ export class SnapApiController {
       )
       .subscribe(
         (data) => {
-          res.header('Access-Control-Allow-Origin', this.CORS);
           if (this.isRxHttpRequestResponse(data)) {
             res.status(data.response.statusCode).json(JSON.parse(data.response.body));
           } else {
@@ -79,7 +74,7 @@ export class SnapApiController {
   }
 
   @Get('plugins/:server')
-  getPLuginsList(@Res() res: Response, @Param('server') server: string) {
+  getPluginsList(@Res() res: Response, @Param('server') server: string) {
     RxHR.get(server + '/v2/plugins')
       .timeout(200)
       .catch(
@@ -89,7 +84,6 @@ export class SnapApiController {
       )
       .subscribe(
         (data) => {
-          res.header('Access-Control-Allow-Origin', this.CORS);
           if (this.isRxHttpRequestResponse(data)) {
             res.status(data.response.statusCode).json(JSON.parse(data.response.body));
           } else {

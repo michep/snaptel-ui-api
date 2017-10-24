@@ -1,4 +1,4 @@
-import { Module, NestModule, MiddlewaresConsumer, RequestMethod } from '@nestjs/common';
+import { Module, NestModule, MiddlewaresConsumer } from '@nestjs/common';
 import { SnapApiController } from './snapapi/snapapi.controller';
 import { ServersController } from './serversapi/serversapi.controller';
 import { CorsMiddleware } from '../middleware/cors.middleware';

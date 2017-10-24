@@ -13,7 +13,7 @@ function bootstrapCluster() {
       cluster.fork();
     }
   } else {
-    const app = NestFactory.create(ApplicationModule)
+    NestFactory.create(ApplicationModule)
       .then(
         (a) => {
           a.use(bodyParser.json());

@@ -1,6 +1,6 @@
 import { RxHR, RxHttpRequestResponse } from '@akanass/rx-http-request';
-import { Controller, Param, Get, Res } from '@nestjs/common';
-import { Response } from 'express';
+import { Controller, Param, Get, Put, Options, Res, Req, Query, Body } from '@nestjs/common';
+import { Response, Request } from 'express';
 
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/timeout';
@@ -16,7 +16,6 @@ export class SnapApiController {
   @Get('tasks/:server')
   getTasksList(@Res() res: Response, @Param('server') server: string) {
     RxHR.get(server + '/v2/tasks')
-      .timeout(100)
       .catch(
         (err, data) => {
           return Observable.of({});
@@ -25,7 +24,7 @@ export class SnapApiController {
       .subscribe(
         (data) => {
           if (this.isRxHttpRequestResponse(data)) {
-            res.status(data.response.statusCode).json(JSON.parse(data.response.body));
+            res.status(data.response.statusCode).send(data.response.body);
           } else {
             res.sendStatus(500);
           }
@@ -36,7 +35,6 @@ export class SnapApiController {
   @Get('tasks/:server/:id')
   getTask(@Res() res: Response, @Param('server') server: string, @Param('id') id: string) {
     RxHR.get(server + '/v2/tasks/' + id)
-      .timeout(200)
       .catch(
         (err, data) => {
           return Observable.of({});
@@ -45,7 +43,27 @@ export class SnapApiController {
       .subscribe(
         (data) => {
           if (this.isRxHttpRequestResponse(data)) {
-            res.status(data.response.statusCode).json(JSON.parse(data.response.body));
+            res.status(data.response.statusCode).send(data.response.body);
+          } else {
+            res.sendStatus(500);
+          }
+        },
+      );
+  }
+
+  @Put('tasks/:server/:id')
+  taskAcion(@Req() request: Request, @Res() res: Response, @Param('server') server: string, @Param('id') id: string) {
+    const query = request.url.split('?').slice(1).join('?');
+    RxHR.put(server + '/v2/tasks/' + id + '?' + query)
+      .catch(
+        (err, data) => {
+          return Observable.of({});
+        },
+      )
+      .subscribe(
+        (data) => {
+          if (this.isRxHttpRequestResponse(data)) {
+            res.status(data.response.statusCode).send(data.response.body);
           } else {
             res.sendStatus(500);
           }
@@ -56,7 +74,6 @@ export class SnapApiController {
   @Get('metrics/:server')
   getMetricsList(@Res() res: Response, @Param('server') server: string) {
     RxHR.get(server + '/v2/metrics')
-      .timeout(200)
       .catch(
         (err, data) => {
           return Observable.of({});
@@ -65,7 +82,7 @@ export class SnapApiController {
       .subscribe(
         (data) => {
           if (this.isRxHttpRequestResponse(data)) {
-            res.status(data.response.statusCode).json(JSON.parse(data.response.body));
+            res.status(data.response.statusCode).send(data.response.body);
           } else {
             res.sendStatus(500);
           }
@@ -76,7 +93,6 @@ export class SnapApiController {
   @Get('plugins/:server')
   getPluginsList(@Res() res: Response, @Param('server') server: string) {
     RxHR.get(server + '/v2/plugins')
-      .timeout(200)
       .catch(
         (err, data) => {
           return Observable.of({});
@@ -85,7 +101,7 @@ export class SnapApiController {
       .subscribe(
         (data) => {
           if (this.isRxHttpRequestResponse(data)) {
-            res.status(data.response.statusCode).json(JSON.parse(data.response.body));
+            res.status(data.response.statusCode).send(data.response.body);
           } else {
             res.sendStatus(500);
           }
@@ -96,4 +112,10 @@ export class SnapApiController {
   private isRxHttpRequestResponse(arg: any): arg is RxHttpRequestResponse {
     return arg.response !== undefined && arg.body !== undefined;
   }
+
+  @Options('*')
+  options(@Body() body, @Res() res) {
+    res.send(body);
+  }
+
 }

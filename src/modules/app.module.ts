@@ -1,12 +1,12 @@
 import { Module, NestModule, MiddlewaresConsumer, RequestMethod } from '@nestjs/common';
 import { SnapApiController } from './snapapi/snapapi.controller';
-import { SeversController } from './servers/servers.controller';
+import { ServersController } from './serversapi/serversapi.controller';
 import { CorsMiddleware } from '../middleware/cors.middleware';
 
 @Module({
   controllers: [
     SnapApiController,
-    SeversController,
+    ServersController,
   ],
   components: [],
   modules: [],
@@ -17,7 +17,7 @@ export class ApplicationModule implements NestModule {
   configure(consumer: MiddlewaresConsumer) {
     consumer.apply(CorsMiddleware).forRoutes(
       SnapApiController,
-      SeversController,
+      ServersController,
     );
   }
 }

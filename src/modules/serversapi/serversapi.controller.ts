@@ -4,7 +4,7 @@ import { initSync, getItemSync, setItemSync } from 'node-persist';
 import { SnapServer } from '../../shared/snap';
 
 @Controller('serversapi')
-export class SeversController {
+export class ServersController {
 
     private servers: any;
     private CORS: string = '*';
@@ -45,14 +45,8 @@ export class SeversController {
       res.send('');
   }
 
-  @Options('')
+  @Options('*')
   options(@Body() body, @Res() res) {
     res.send(body);
   }
-
-  @Options(':id')
-  optionsID(@Body() body, @Res() res) {
-    res.send(body);
-  }
-
 }
